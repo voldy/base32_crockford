@@ -9,18 +9,29 @@ defmodule Base32Crockford do
   @doc ~S"""
   Encodes an integer number into base32-crockford encoded string.
   """
-  @spec encode(integer) :: binary
-  def encode(0), do: {:ok, "0"}
-  def encode(number) when is_integer(number) do
-    base10to32([], number) |> to_string
+  @spec encode(integer, keyword) :: binary
+  def encode(number, opts \\ []) when is_integer(number) do
+    base10to32([], number)
+    |> append_check_symbol(number, opts)
+    |> to_string
   end
 
+  defp base10to32([], 0), do: '0'
   defp base10to32(chars, 0), do: chars
   defp base10to32(chars, number) do
     reminder = rem(number, 32)
     chars = [enc(reminder) | chars]
     number = div(number, 32)
     base10to32(chars, number)
+  end
+
+  defp append_check_symbol(chars, number, opts) do
+    if Keyword.get(opts, :check_symbol, false) do
+      reminder = rem(number, 37)
+      chars <> enc(reminder)
+    else
+      chars
+    end
   end
 
   @doc ~S"""
@@ -47,7 +58,7 @@ defmodule Base32Crockford do
     end
   end
 
-  alphabet = Enum.with_index('0123456789ABCDEFGHJKMNPQRSTVWXYZ')
+  alphabet = Enum.with_index('0123456789ABCDEFGHJKMNPQRSTVWXYZ*~$=U')
   for {encoding, value} <- alphabet do
     defp enc(unquote(value)), do: unquote(encoding)
     defp dec(unquote(encoding)), do: {:ok, unquote(value)}

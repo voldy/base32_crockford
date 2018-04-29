@@ -5,8 +5,16 @@ defmodule Base32CrockfordTest do
 
   describe "#encode" do
     test "encodes integer to base 32 string" do
+      assert "0" == encode(0)
       assert "Z" == encode(31)
       assert "16J" == encode(1234)
+    end
+
+    test "appends check symbol" do
+      assert "00" == encode(0, check_symbol: true)
+      assert "Z0" == encode(31, check_symbol: true)
+      assert "16JD" == encode(1234, check_symbol: true)
+      assert "16J~" == encode(1254, check_symbol: true)
     end
   end
 
