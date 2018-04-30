@@ -17,6 +17,12 @@ defmodule Base32CrockfordTest do
       assert "16JD" == encode(1234, check_symbol: true)
       assert "1CZ~" == encode(1439, check_symbol: true)
     end
+
+    test "partions encoded string by hyphens" do
+      assert "XS-NJ-G0" == encode(1_000_000_000, partition_length: 2)
+      assert "XSN-JG0" == encode(1_000_000_000, partition_length: 3)
+      assert "XSNJ-G0" == encode(1_000_000_000, partition_length: 4)
+    end
   end
 
   describe "#decode" do
@@ -50,6 +56,10 @@ defmodule Base32CrockfordTest do
 
     test "returns error when wrong check symbol" do
       assert :error == decode("1CZ*", check_symbol: true)
+    end
+
+    test "ignores hyphens" do
+      assert {:ok, 1_000_000_000} == decode("XS-NJ-G0")
     end
   end
 end

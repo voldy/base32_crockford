@@ -14,6 +14,7 @@ defmodule Base32Crockford do
     init_encoding(number, opts)
     |> base10to32(number)
     |> to_string
+    |> partition(opts)
   end
 
   @doc ~S"""
@@ -22,6 +23,7 @@ defmodule Base32Crockford do
   @spec decode(binary, keyword) :: {:ok, integer} | :error
   def decode(binary, opts \\ []) when is_binary(binary) do
     {chars, check_symbol} = binary
+    |> String.replace("-", "")
     |> String.upcase
     |> String.reverse
     |> String.to_charlist
@@ -78,6 +80,26 @@ defmodule Base32Crockford do
       ^check_symbol ->
         {:ok, number}
       _ -> :error
+    end
+  end
+
+  defp partition(binary, opts) do
+    case Keyword.get(opts, :partition_length, 0) do
+      0 -> binary
+      len ->
+        split([], binary, len)
+        |> Enum.reverse
+        |> Enum.join("-")
+    end
+  end
+
+  defp split(parts, binary, len) do
+    {part, rest} = String.split_at(binary, len)
+    parts = [part | parts]
+    if String.length(rest) > len do
+      split(parts, rest, len)
+    else
+      [rest | parts]
     end
   end
 
