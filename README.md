@@ -1,4 +1,5 @@
 # Base32Crockford
+[![Build Status](https://travis-ci.org/voldy/base32_crockford.svg?branch=master)](https://travis-ci.org/voldy/base32_crockford)
 
 An alternate base32 encoding as described by Douglas Crockford at: 
 [https://www.crockford.com/wrmg/base32.html](https://www.crockford.com/wrmg/base32.html)
