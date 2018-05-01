@@ -62,4 +62,4 @@ Hosted on [http://hexdocs.pm/base32_crockford/readme.html](http://hexdocs.pm/bas
 ## Author
 Vladimir Zhukov
 
-Base32Crockford is released under the [MIT License](https://github.com/voldy/base32_crockford/blob/master/LICENSE.txt).
+Base32Crockford is released under the [MIT License](https://github.com/voldy/base32_crockford/blob/master/LICENSE).
