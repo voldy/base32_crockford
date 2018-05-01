@@ -7,13 +7,23 @@ An alternate base32 encoding as described by Douglas Crockford at:
 It is used for expressing integer numbers in a form that can be conveniently 
 and accurately transmitted between humans and computer systems.
 
-
 The encoding is designed to:
 
 - Be human and machine readable
 - Be compact
 - Be error resistant
 - Be pronounceable
+
+A symbol set of 10 digits and 22 letters is used:
+`0123456789ABCDEFGHJKMNPQRSTVWXYL`
+It does not include 4 of the 26 letters: I L O U.
+
+A check symbol can be appended to a symbol string. 5 additional symbols
+`*~$=U` are used only for encoding or decoding the check symbol.
+
+When decoding, upper and lower case letters are accepted,
+and `i` and `l` will be treated as `1` and `o` will be treated as `0`.
+When encoding, only upper case letters are used.
 
 ## Installation
 
