@@ -1,28 +1,62 @@
 defmodule Base32Crockford do
   @moduledoc ~S"""
-  Base32-Crockford:  base-32 encoding for expressing integer numbers
+  Base32-Crockford: base-32 encoding for expressing integer numbers
   in a form that can be conveniently and accurately transmitted
   between humans and computer systems.
 
   [https://www.crockford.com/wrmg/base32.html](https://www.crockford.com/wrmg/base32.html)
+
+  A symbol set of 10 digits and 22 letters is used:
+  `0123456789ABCDEFGHJKMNPQRSTVWXYZ`
+  It does not include 4 of the 26 letters: I L O U.
+
+  A check symbol can be appended to a symbol string. 5 additional symbols
+  `*~$=U` are used only for encoding or decoding the check symbol.
+
+  When decoding, upper and lower case letters are accepted,
+  and i and l will be treated as 1 and o will be treated as 0.
+  When encoding, only upper case letters are used.
   """
 
   @doc ~S"""
   Encodes an integer number into base32-crockford encoded string.
 
+  Checksum can be added to the end of the string if the
+  `:checksum` option is set to true.
+
+  For better readability the resulting string can be partitioned by hyphens
+  if the `:partitions` option is provided.
+
+  ## Options
+
+    * `:checksum` (boolean) - the check symbol will be added to the end
+    of the string. The check symbol encodes the number modulo 37,
+    37 being the least prime number greater than 32.
+
+    * `:partitions` (positive integer) - hyphens (-) will be inserted into
+    symbol strings to partition a string into manageable pieces,
+    improving readability by helping to prevent confusion.
+
   ## Examples
 
-      iex> Base32Crockford.encode(1_000_000_000)
-      "XSNJG0"
+      iex> Base32Crockford.encode(973_113_317)
+      "X011Z5"
 
-      iex> Base32Crockford.encode(1_000_000_000, partition_length: 2)
-      "XS-NJ-G0"
+  To add a check symbol to the end of the string:
 
-      iex> Base32Crockford.encode(1_000_000_000, partition_length: 3)
-      "XSN-JG0"
+      iex> Base32Crockford.encode(973_113_317, checksum: true)
+      "X011Z5$"
 
-      iex> Base32Crockford.encode(32, check_symbol: true)
-      "10*"
+  To partition a resulting string into pieces:
+
+      iex> Base32Crockford.encode(973_113_317, partitions: 2)
+      "X01-1Z5"
+
+      iex> Base32Crockford.encode(973_113_317, partitions: 3)
+      "X0-11-Z5"
+
+      iex> Base32Crockford.encode(973_113_317, partitions: 4)
+      "X-0-11-Z5"
   """
   @spec encode(integer, keyword) :: binary
   def encode(number, opts \\ []) when is_integer(number) do
@@ -35,23 +69,37 @@ defmodule Base32Crockford do
   @doc ~S"""
   Decodes base32-crockford encoded string into integer number.
 
+  Upper and lower case letters are accepted, and i and l will be treated as 1
+  and o will be treated as 0.
+
+  Hyphens are ignored during decoding.
+
+  ## Options
+
+    * `:checksum` (boolean) - the last symbol will be considered as check symbol
+    and extracted from the encoded string before decoding. It then will be
+    compared with a check symbol calculated from a decoded number.
+
   ## Examples
 
-      iex> Base32Crockford.decode("XSNJG0")
-      {:ok, 1000000000}
+      iex> Base32Crockford.decode("X011Z5")
+      {:ok, 973113317}
 
-      iex> Base32Crockford.decode("XSN-JG0")
-      {:ok, 1000000000}
+      iex> Base32Crockford.decode("XoIlZ5")
+      {:ok, 973113317}
 
-      iex> Base32Crockford.decode("10*", check_symbol: true)
-      {:ok, 32}
+      iex> Base32Crockford.decode("X01-1Z5")
+      {:ok, 973113317}
 
-      iex> Base32Crockford.decode("10~", check_symbol: true)
+      iex> Base32Crockford.decode("X011Z5$", checksum: true)
+      {:ok, 973113317}
+
+      iex> Base32Crockford.decode("X011Z5=", checksum: true)
       :error
   """
   @spec decode(binary, keyword) :: {:ok, integer} | :error
   def decode(binary, opts \\ []) when is_binary(binary) do
-    {chars, check_symbol} = binary
+    {chars, checksum} = binary
     |> String.replace("-", "")
     |> String.upcase
     |> String.reverse
@@ -65,23 +113,23 @@ defmodule Base32Crockford do
     case Enum.filter(values, &(&1 == :error)) do
       [] ->
         Enum.sum(values)
-        |> check(check_symbol)
+        |> check(checksum)
       _ -> :error
     end
   end
 
   defp init_encoding(number, opts) do
-    if Keyword.get(opts, :check_symbol, false) do
-      [calculate_check_symbol(number)]
+    if Keyword.get(opts, :checksum, false) do
+      [calculate_checksum(number)]
     else
       []
     end
   end
 
   defp init_decoding(chars, opts) do
-    if Keyword.get(opts, :check_symbol, false) do
-      [check_symbol | chars] = chars
-      {chars, check_symbol}
+    if Keyword.get(opts, :checksum, false) do
+      [checksum | chars] = chars
+      {chars, checksum}
     else
       {chars, nil}
     end
@@ -104,35 +152,33 @@ defmodule Base32Crockford do
   end
 
   defp check(number, nil), do: {:ok, number}
-  defp check(number, check_symbol) do
-    case calculate_check_symbol(number) do
-      ^check_symbol ->
+  defp check(number, checksum) do
+    case calculate_checksum(number) do
+      ^checksum ->
         {:ok, number}
       _ -> :error
     end
   end
 
   defp partition(binary, opts) do
-    case Keyword.get(opts, :partition_length, 0) do
-      0 -> binary
-      len ->
-        split([], binary, len)
+    case Keyword.get(opts, :partitions, 0) do
+      count when count in [0, 1] ->
+        binary
+      count ->
+        split([], binary, count)
         |> Enum.reverse
         |> Enum.join("-")
     end
   end
 
-  defp split(parts, binary, len) do
+  defp split(parts, binary, 1), do: [binary | parts]
+  defp split(parts, binary, count) do
+    len = div(String.length(binary), count)
     {part, rest} = String.split_at(binary, len)
-    parts = [part | parts]
-    if String.length(rest) > len do
-      split(parts, rest, len)
-    else
-      [rest | parts]
-    end
+    split([part | parts], rest, count - 1)
   end
 
-  defp calculate_check_symbol(number) do
+  defp calculate_checksum(number) do
     reminder = rem(number, 37)
     enc(reminder)
   end

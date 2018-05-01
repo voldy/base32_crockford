@@ -12,16 +12,16 @@ defmodule Base32CrockfordTest do
     end
 
     test "appends check symbol" do
-      assert "00" == encode(0, check_symbol: true)
-      assert "ZZ" == encode(31, check_symbol: true)
-      assert "16JD" == encode(1234, check_symbol: true)
-      assert "1CZ~" == encode(1439, check_symbol: true)
+      assert "00" == encode(0, checksum: true)
+      assert "ZZ" == encode(31, checksum: true)
+      assert "16JD" == encode(1234, checksum: true)
+      assert "1CZ~" == encode(1439, checksum: true)
     end
 
     test "partions encoded string by hyphens" do
-      assert "XS-NJ-G0" == encode(1_000_000_000, partition_length: 2)
-      assert "XSN-JG0" == encode(1_000_000_000, partition_length: 3)
-      assert "XSNJ-G0" == encode(1_000_000_000, partition_length: 4)
+      assert "XS-NJ-G0" == encode(1_000_000_000, partitions: 3)
+      assert "XSN-JG0" == encode(1_000_000_000, partitions: 2)
+      assert "XSNJG0" == encode(1_000_000_000, partitions: 1)
     end
   end
 
@@ -50,12 +50,12 @@ defmodule Base32CrockfordTest do
     end
 
     test "checks encoded string with check symbol" do
-      assert {:ok, 31} == decode("ZZ", check_symbol: true)
-      assert {:ok, 1439} == decode("1CZ~", check_symbol: true)
+      assert {:ok, 31} == decode("ZZ", checksum: true)
+      assert {:ok, 1439} == decode("1CZ~", checksum: true)
     end
 
     test "returns error when wrong check symbol" do
-      assert :error == decode("1CZ*", check_symbol: true)
+      assert :error == decode("1CZ*", checksum: true)
     end
 
     test "ignores hyphens" do
