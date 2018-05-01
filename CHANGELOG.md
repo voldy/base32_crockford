@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.0
+
+* implemented `decode!` which returns integer or raises an `ArgumentError`.
+
 ## v0.2.0
 
 * renamed encoding and decoding option `check_symbol` to `checksum`.

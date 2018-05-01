@@ -118,6 +118,29 @@ defmodule Base32Crockford do
     end
   end
 
+  @doc ~S"""
+  Similar to `decode/2` but raises `ArgumentError` if a checksum is invalid or
+  an invalid character is present in the string.
+
+  ## Options
+
+  Accepts the same options as `decode/2`.
+
+  ## Examples
+
+      iex> Base32Crockford.decode!("X011Z5")
+      973113317
+  """
+  @spec decode!(binary, keyword) :: integer
+  def decode!(binary, opts \\ []) when is_binary(binary) do
+    case decode(binary, opts) do
+      {:ok, number} -> number
+      :error ->
+        raise ArgumentError, "contains invalid character or checksum does not match"
+    end
+  end
+
+
   defp init_encoding(number, opts) do
     if Keyword.get(opts, :checksum, false) do
       [calculate_checksum(number)]

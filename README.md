@@ -23,7 +23,7 @@ The package can be installed as:
 
     ```elixir
     def deps do
-      [{:base32_crockford, "~> 0.1.0"}]
+      [{:base32_crockford, "~> 1.0.0"}]
     end
     ```
 
@@ -36,8 +36,14 @@ The package can be installed as:
 iex> Base32Crockford.encode(1_000_000_000)
 "XSNJG0"
 
+iex> Base32Crockford.encode(1_000_000_000, partitions: 2)
+"XSN-JG0"
+
 iex> Base32Crockford.decode("XSNJG0")
 {:ok, 1000000000}
+
+iex> Base32Crockford.decode!("XSNJG0")
+1000000000
 ```
     
 ## Documentation

@@ -62,4 +62,24 @@ defmodule Base32CrockfordTest do
       assert {:ok, 1_000_000_000} == decode("XS-NJ-G0")
     end
   end
+
+  describe "#decode!" do
+    test "decodes base 32 encoded string to integer" do
+      assert 31 == decode!("Z")
+      assert 1234 == decode!("16J")
+    end
+
+    test "raises ArgumentError for unsupported characters" do
+      assert_raise ArgumentError, fn ->
+        decode!("U")
+      end
+    end
+
+    test "raises ArgumentError when wrong check symbol" do
+      assert 1439 == decode!("1CZ~", checksum: true)
+      assert_raise ArgumentError, fn ->
+        decode!("1CZ*", checksum: true)
+      end
+    end
+  end
 end
