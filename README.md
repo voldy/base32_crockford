@@ -29,7 +29,7 @@ When encoding, only upper case letters are used.
 
 The package can be installed as:
 
-  1. Add exiban to your list of dependencies in `mix.exs`:
+  1. Add base32_crockford to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
