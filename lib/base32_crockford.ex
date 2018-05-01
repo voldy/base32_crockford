@@ -4,7 +4,7 @@ defmodule Base32Crockford do
   in a form that can be conveniently and accurately transmitted
   between humans and computer systems.
 
-  https://www.crockford.com/wrmg/base32.html
+  [https://www.crockford.com/wrmg/base32.html](https://www.crockford.com/wrmg/base32.html)
   """
 
   @doc ~S"""

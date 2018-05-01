@@ -1,7 +1,8 @@
 # Base32Crockford
 
 An alternate base32 encoding as described by Douglas Crockford at: 
-http://www.crockford.com/wrmg/base32.html.
+[https://www.crockford.com/wrmg/base32.html](https://www.crockford.com/wrmg/base32.html)
+
 It is used for expressing integer numbers in a form that can be conveniently 
 and accurately transmitted between humans and computer systems.
 
@@ -39,7 +40,7 @@ iex> Base32Crockford.decode("XSNJG0")
 ```
     
 ## Documentation
-Hosted on [http://hexdocs.pm/base32_crockford/Base32-Crockford.html](http://hexdocs.pm/base32_crockford/Base32-Crockford.html)
+Hosted on [http://hexdocs.pm/base32_crockford/readme.html](http://hexdocs.pm/base32_crockford/readme.html)
 
 ## Author
 Vladimir Zhukov
