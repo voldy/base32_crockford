@@ -1,13 +1,28 @@
 defmodule Base32Crockford do
   @moduledoc ~S"""
-  Base32-Crockford: human and machine readable, compact, error resistant
-  and pronounceable base-32 encoding.
+  Base32-Crockford:  base-32 encoding for expressing integer numbers
+  in a form that can be conveniently and accurately transmitted
+  between humans and computer systems.
 
   https://www.crockford.com/wrmg/base32.html
   """
 
   @doc ~S"""
   Encodes an integer number into base32-crockford encoded string.
+
+  ## Examples
+
+      iex> Base32Crockford.encode(1_000_000_000)
+      "XSNJG0"
+
+      iex> Base32Crockford.encode(1_000_000_000, partition_length: 2)
+      "XS-NJ-G0"
+
+      iex> Base32Crockford.encode(1_000_000_000, partition_length: 3)
+      "XSN-JG0"
+
+      iex> Base32Crockford.encode(32, check_symbol: true)
+      "10*"
   """
   @spec encode(integer, keyword) :: binary
   def encode(number, opts \\ []) when is_integer(number) do
@@ -19,6 +34,20 @@ defmodule Base32Crockford do
 
   @doc ~S"""
   Decodes base32-crockford encoded string into integer number.
+
+  ## Examples
+
+      iex> Base32Crockford.decode("XSNJG0")
+      {:ok, 1000000000}
+
+      iex> Base32Crockford.decode("XSN-JG0")
+      {:ok, 1000000000}
+
+      iex> Base32Crockford.decode("10*", check_symbol: true)
+      {:ok, 32}
+
+      iex> Base32Crockford.decode("10~", check_symbol: true)
+      :error
   """
   @spec decode(binary, keyword) :: {:ok, integer} | :error
   def decode(binary, opts \\ []) when is_binary(binary) do

@@ -1,19 +1,47 @@
 # Base32Crockford
 
-**TODO: Add description**
+An alternate base32 encoding as described by Douglas Crockford at: 
+http://www.crockford.com/wrmg/base32.html.
+It is used for expressing integer numbers in a form that can be conveniently 
+and accurately transmitted between humans and computer systems.
+
+
+The encoding is designed to:
+
+- Be human and machine readable
+- Be compact
+- Be error resistant
+- Be pronounceable
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `base32_crockford` to your list of dependencies in `mix.exs`:
+The package can be installed as:
+
+  1. Add exiban to your list of dependencies in `mix.exs`:
+
+    ```elixir
+    def deps do
+      [{:base32_crockford, "~> 0.1.0"}]
+    end
+    ```
+
+  2. Run `mix deps.get` in your console to fetch from Hex
+
+
+## Usage
 
 ```elixir
-def deps do
-  [{:base32_crockford, "~> 0.1.0"}]
-end
+iex> Base32Crockford.encode(1_000_000_000)
+"XSNJG0"
+
+iex> Base32Crockford.decode("XSNJG0")
+{:ok, 1000000000}
 ```
+    
+## Documentation
+Hosted on [http://hexdocs.pm/base32_crockford/Base32-Crockford.html](http://hexdocs.pm/base32_crockford/Base32-Crockford.html)
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/base32_crockford](https://hexdocs.pm/base32_crockford).
+## Author
+Vladimir Zhukov
 
+Base32Crockford is released under the [MIT License](https://github.com/voldy/base32_crockford/blob/master/LICENSE.txt).
