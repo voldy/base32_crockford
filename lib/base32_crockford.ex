@@ -170,7 +170,7 @@ defmodule Base32Crockford do
 
   defp base32to10({char, power}) do
     with {:ok, value} <- dec(char) do
-      value * :math.pow(32, power) |> round
+      value * Integer.pow(32, power)
     end
   end
 
